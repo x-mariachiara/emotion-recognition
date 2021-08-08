@@ -1,76 +1,32 @@
-import numpy as np
 import tensorflow as tf
 from tensorflow import keras
-from keras import preprocessing
-from keras.datasets import mnist
-import keras.utils
+from tensorflow.keras import layers
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import matplotlib.pyplot as plt
-import os
-import cv2
-import random
-import pickle
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Dropout, Activation, Flatten, Conv2D, MaxPooling2D
-
-
-
-
 
 dataset = "/media/mariachiara/307EE13523D10A66/TERZO_ANNO/TESI/dataset_labbelled"
-emozioni_corrisponenti = ["neutrale", "rabbia", "disprezzo", "disgusto", "paura", "felicità", "tristezza", "sorpresa"]
-emo_val = [0, 1, 2, 3, 4, 5, 6, 7]
 
-for emozioni in emozioni_corrisponenti:
-    path = os.path.join(dataset, emozioni)
-    for img in os.listdir(path):
-        img_array = cv2.imread(os.path.join(path, img), cv2.IMREAD_GRAYSCALE)
-        #print(img_array)
+altezza = 28
+larghezza = 28
+batch_size = 2
 
-training_data = []
+model = keras.Sequential([layers.Input((28,28,1)), layers.Conv2D(16,3,padding="same"), layers.Conv2D(32,3,padding="same"), layers.MaxPooling2D(), layers.Flatten(), layers.Dense(10)])
 
-def create_training_data():
-    for emozioni in emozioni_corrisponenti:
-        path = os.path.join(dataset, emozioni)
-        emo = emozioni_corrisponenti.index(emozioni)
-        for img in os.listdir(path):
-            try:
-                img_array = cv2.imread(os.path.join(path, img), cv2.IMREAD_GRAYSCALE)
-                training_data.append([img_array, emo])
-            except Exception as e:
-                pass
+trainData = tf.keras.preprocessing.image_dataset_from_directory(dataset, labels="inferred", label_mode="int", color_mode="grayscale", batch_size=batch_size, image_size=(altezza,larghezza), shuffle=True, seed=123, validation_split=0.1, subset="training")
+validationData = tf.keras.preprocessing.image_dataset_from_directory(dataset, labels="inferred", label_mode="int", color_mode="grayscale", batch_size=batch_size, image_size=(altezza,larghezza), shuffle=True, seed=123, validation_split=0.1, subset="validation")
 
-create_training_data()
+model.compile(optimizer=keras.optimizers.Adam(), loss=[keras.losses.SparseCategoricalCrossentropy(from_logits=True)], metrics=["accuracy"])
+#history = model.fit(trainData, epochs=50, verbose=2)
+history = model.fit(trainData, validation_data=validationData, epochs=50,batch_size=1024,shuffle=True)
+print(history.history.keys())
 
-dataTrain = np.array(training_data)
-dataTrain = tf.convert_to_tensor(dataTrain)
-print(dataTrain)
+def genera_grafico(history):
+    plt.plot(history.history["accuracy"])
+    plt.xlabel("epoche")
+    plt.ylabel("accuratezza")
+    plt.title("Grafico Accuratezza")
+    plt.show()
 
-#print("flattern", dataTrain[0].flatten())
+genera_grafico(history)
 
-#print("spero funzioni", dataTrain[0].shape)
-
-tot_train_examples = 335
-width=640
-height=490
-channels = 1
-f_size1 = 32 #numero filtri primo strato del modello
-f_size2= 16  #numero filtri secondo strato del modello
-
-train_emo = tf.keras.utils.to_categorical(emo_val)
-#print(train_emo[0])
-
-model = Sequential()
-model.add(Conv2D(f_size1, kernel_size=3, activation='relu', input_shape=(width,height,channels)))
-model.add(Dropout(0.3))
-
-model.add(Conv2D(f_size2, kernel_size=3, activation='relu'))
-model.add(Dropout(0.3))
-
-model.add(Flatten())
-
-model.add(Dense(10, activation='softmax'))
-
-model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-
-history = model.fit(dataTrain, train_emo, epochs=10, batch_size=1024, shuffle=True)
 
