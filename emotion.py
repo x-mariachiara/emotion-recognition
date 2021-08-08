@@ -42,6 +42,8 @@ def create_training_data():
 create_training_data()
 
 dataTrain = np.array(training_data)
+dataTrain = tf.convert_to_tensor(dataTrain)
+print(dataTrain)
 
 #print("flattern", dataTrain[0].flatten())
 
@@ -71,100 +73,4 @@ model.add(Dense(10, activation='softmax'))
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
 history = model.fit(dataTrain, train_emo, epochs=10, batch_size=1024, shuffle=True)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#print(len(training_data))
-# random.shuffle(training_data)
-#
-# for sample in training_data[:10]:
-#     pass
-#     #print(sample[1])
-#
-# X = []
-# y = []
-#
-# for feature, label in training_data:
-#     X.append(feature)
-#     y.append(label)
-#
-#
-# pickle_out = open("X.pickle", "wb")
-# pickle.dump(X, pickle_out)
-# pickle_out.close()
-#
-# pickle_out = open("y.pickle", "wb")
-# pickle.dump(y, pickle_out)
-# pickle_out.close()
-#
-# X = pickle.load(open("x.pickle", "rb"))
-# y = pickle.load(open("y.pickle", "rb"))
-#
-#
-# model = Sequential()
-#
-# model.add(Conv2D(64, (3,3)))
-# model.add(Activation("relu"))
-# model.add(MaxPooling2D(pool_size=(2,2)))
-#
-# model.add(Flatten())
-# model.add(Dense(64))
-#
-# model.add(Dense(1))
-# model.add(Activation("sigmoid"))
-
-# model.compile(loss="binary_crossentropy",
-#               optimizer="adam",
-#               metrics=["accuracy"])
-#
-# model.fit(X, y, batch_size=32, validation_split=0.1)
-
-
-
-#dataset = tf.keras.preprocessing.image_dataset_from_directory("/media/mariachiara/307EE13523D10A66/TERZO_ANNO/TESI/dataset_labbelled", labels='inferred')
-#print(dataset)
-
-# (x_train, y_train), (x_test, y_test) = dataset.load_data()
-# print("funzia")
-# print((x_train, y_train), (x_test, y_test))
 
