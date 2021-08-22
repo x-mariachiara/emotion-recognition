@@ -23,7 +23,7 @@ model.compile(optimizer=keras.optimizers.Adam(), loss=[keras.losses.SparseCatego
 history = model.fit(trainData, validation_data=testData, epochs=50,batch_size=1024,shuffle=True)
 #print(history.history.keys())
 
-def genera_grafico(history):
+def genera_grafico_accuratezza(history):
     plt.plot(history.history["accuracy"])
     plt.plot(history.history["val_accuracy"])
     plt.xlabel("epoche")
@@ -32,9 +32,19 @@ def genera_grafico(history):
     plt.legend(["Train", "Test"], loc ="upper left")
     plt.show()
 
-genera_grafico(history)
+def genera_grafico_loss(history):
+    plt.plot(history.history["loss"])
+    plt.plot(history.history["val_loss"])
+    plt.xlabel("epoche")
+    plt.ylabel("perdita")
+    plt.title("Grafico Perdita")
+    plt.legend(["Train", "Test"], loc ="upper left")
+    plt.show()
 
-print()
+genera_grafico_accuratezza(history)
+genera_grafico_loss(history)
+
+print(history.history.keys())
 
 image = tf.keras.preprocessing.image.load_img("/media/mariachiara/307EE13523D10A66/TERZO_ANNO/TESI/datasetConMascherine/001/S005_001_00000011.png", color_mode='grayscale', target_size=(altezza, larghezza), interpolation='nearest')
 input_arr = tf.keras.preprocessing.image.img_to_array(image)
